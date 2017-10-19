@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="x-ua-compatible" content="IE=Edge">
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link href="http://v2.bootcss.com/assets/css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="http://v2.bootcss.com/assets/css/bootstrap-responsive.css" rel="stylesheet">
+        <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+        <script src="http://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script src="http://cdn.bootcss.com/bootstrap-hover-dropdown/2.0.10/bootstrap-hover-dropdown.min.js"></script>
+        <style>
+        /* tag.class且; .class .class下级; .class,.class都*/
+            textarea.juy {
+                cursor: text;
+                border-style: none;
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+            }
+        /* 令textarea铺满所在的div*/
+            .dofull{
+                resize: none;
+                width: 100%;
+                box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
+        /*据说可以解决row高度不一致的问题。然而textarea有边*/
+            #my-row {
+                display: table;
+            }
+
+            #my-row .panel {
+                /*float: none;*/
+                display: table-cell;
+                vertical-align: top;
+            }
+            .dropdown .parsechar{
+                display: inline-block;
+            }
+
+            .hanzi {
+                position: relative;
+                display: inline-block;
+            }
+            .hanzi p{
+                display: inline-block;
+                padding: 2px;
+            }
+            .hanzi p:hover{
+                background: rgb(200,0,200);
+            }
+            .otherhanzi{
+                /*visibility: hidden;*/
+                position: absolute;
+                display: none;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            }
+            .hanzi:hover .otherhanzi{
+                /*visibility: visible;*/
+                display: block;
+            }
+            .otherhanzi a{
+                color: black;
+                padding: 2px;
+                text-decoration: none;
+                display: block;
+            }
+
+
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+        </div>
+        
+        <div class="container">
+            <br>
+            <h1>擬音互查</h1>
+            <br>
+            <!-- <form> -->
+            <div class="row" id="my-row">
+<!--                 <textarea rows="4" class="span5" style="resize: none;"></textarea>
+                <textarea class="span1" style="visibility:hidden;"></textarea>
+                <textarea rows="4" class="span5" style="resize: none;" readonly="True"></textarea> -->
+                <div class="span5 panel">
+                    <div class="btn-group" id="src">
+                        <button class="btn" id="seleted" style="width:100px;"></button>
+                        <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                        </ul>
+                    </div>
+                    <button class="btn" style="display:inline;float:right;"><i class="icon-retweet"></i></button>
+                    <br></br>
+                    <textarea rows="4" class="dofull" id="searchText"></textarea>
+                </div>
+                <div class="span1 panel"></div>
+                <div class="span5 panel">
+                    <div class="btn-group" id="dst">
+                        <button class="btn" id="seleted" style="width:100px;"></button>
+                        <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                          <!-- <li class="divider"></li> -->
+                        </ul>
+                    </div>
+                    <br></br>
+                    <!-- <textarea rows="4" class="span5 juy dofull" readonly="True" id="resultText"></textarea> -->
+                    <div style="background-color:rgb(240,240,240);" id="resultText">
+                        <!-- <a onmouseover="sl(‘西‘)" onmouseout="cl()" href="#">西</a> -->
+<!--                         <div class="dropdown parsechar">
+                            <p class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">我</p>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">我</a><li>
+                                <li><a href="#">我</a><li>
+                                <li><a href="#">我</a><li>
+                            </ul>
+                        </div>
+                        <div class="hanzi">
+                            <p>是</p>
+                            <div class="otherhanzi">
+                                <a href="#">是</a>
+                                <a href="#">是</a>
+                                <a href="#">是</a>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <!-- </form> -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-default" onclick="transCharacter()">翻  譯</button>
+            </div>
+        </div>
+    </body>
+    <script>
+        var langList = ["漢  字","諺  文","Quốc Ngữ","字  喃","中古羅馬","中古鄭張","上古鄭張"];//zgys to 汉字,汉字 to all the others,maybe 谚文 to 汉字,Chữ Quốc Ngữ to 字喃
+        var codeList = ["hanzi","hangul","ynpy"    ,"ynzn" ,"zgys"   ,"zgzz"   ,"sgzz"];
+        $(document).ready(function(){
+            $("#src .dropdown-menu")
+                .append("<li><a href='#'>"+langList[0]+"</a></li>")
+                .append("<li><a href='#'>"+langList[4]+"</a></li>")
+                .append("<li><a href='#'>"+langList[1]+"</a></li>")
+                .append("<li><a href='#'>"+langList[2]+"</a></li>");
+            $("#src .dropdown-menu li").click(function(){
+                var sel = $(this);
+                $(this).parent().siblings("#seleted:first").text(function(i,old){
+                    selectAlanguage($("#src #seleted"),sel,$("#src .dropdown-menu li:contains('"+old+"')"));
+                });
+            });
+            selectAlanguage($("#src #seleted"),$("#src .dropdown-menu li").eq(1));
+
+            $("#dst .dropdown-menu")
+                .append("<li><a href='#'>"+langList[0]+"</a></li>")
+                .append("<li><a href='#'>"+langList[4]+"</a></li>")
+                .append("<li><a href='#'>"+langList[5]+"</a></li>")
+                .append("<li><a href='#'>"+langList[6]+"</a></li>")
+                .append("<li><a href='#'>"+langList[1]+"</a></li>")
+                .append("<li><a href='#'>"+langList[2]+"</a></li>")
+                .append("<li><a href='#'>"+langList[3]+"</a></li>");
+            $("#dst .dropdown-menu li").click(function(){
+                var sel = $(this);
+                $(this).parent().siblings("#seleted:first").text(function(i,old){
+                    selectAlanguage($("#dst #seleted"),sel,$("#dst .dropdown-menu li:contains('"+old+"')"));
+                });
+            });
+            selectAlanguage($("#dst #seleted"),$("#dst .dropdown-menu li").eq(0));
+
+            $("#resultText").height($("#searchText").height());
+        });
+        function selectAlanguage(_top,_li,_old){
+            if(_old&&_li.text()==_old.text()) return;
+
+            _top.text(_li.text());
+            _li.addClass("disabled");
+            if(_old){
+                _old.removeClass("disabled");
+            }
+        }
+        function transCharacter(){
+            var sendmsg = $("#searchText").val();
+            var srcid = langList.findIndex((txt) => txt==$("#src #seleted").text());
+            var dstid = langList.findIndex((txt) => txt==$("#dst #seleted").text());
+            var srclang,dstlang;
+            if(srcid==-1){
+                //some error
+                return;
+            }else{
+                srclang = codeList[srcid];
+            }
+            if(dstid==-1){
+                //some error
+                return;
+            }else{
+                dstlang = codeList[dstid];
+            }
+            var _data = JSON.stringify({
+                text: sendmsg,
+                srclang: srclang,
+                dstlang: dstlang
+            }, null, '\t');
+
+            $.ajax({
+                type: "POST",
+                url: "/search",
+                contentType: "application/json;charset=UTF-8",
+                data: _data,
+                dataType: "json",
+                success: function(netdata){
+                    var f = $("#resultText");
+                    f.html('');
+                    for(zizu of netdata["results"]){
+                        f.append('<span class="dropdown parsechar"></span>');
+                        var fstf = f.find(".dropdown:last");
+                        if(zizu.length<=0){
+                            fstf.append('<span class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">??</span>');
+                        }else{
+                            fstf.append('<span class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">'+zizu[0]+'</span>');
+                            if(zizu.length>1){
+                                fstf.append('<ul class="dropdown-menu" style="max-height:200px;overflow:auto;"></ul>');
+                                var secf = fstf.find("ul");
+                                for(zi of zizu){
+                                    if(zi==zizu[0]) continue;
+                                    secf.append('<li><a href="#">'+zi+'</a></<li>');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</html>

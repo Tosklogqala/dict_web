@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="x-ua-compatible" content="IE=Edge">
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link href="http://v2.bootcss.com/assets/css/bootstrap.css" rel="stylesheet" media="screen">
+        <link href="http://v2.bootcss.com/assets/css/bootstrap-responsive.css" rel="stylesheet">
+        <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+        <script src="http://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script src="http://cdn.bootcss.com/bootstrap-hover-dropdown/2.0.10/bootstrap-hover-dropdown.min.js"></script>
+        <style>
+        /* tag.class且; .class .class下级; .class,.class都*/
+            textarea.juy {
+                cursor: text;
+                border-style: none;
+                -webkit-box-shadow: none;
+                -moz-box-shadow: none;
+                box-shadow: none;
+            }
+        /* 令textarea铺满所在的div*/
+            .dofull{
+                resize: none;
+                width: 100%;
+                box-sizing: border-box;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
+        /*据说可以解决row高度不一致的问题。然而textarea有边*/
+            #my-row {
+                display: table;
+            }
+
+            #my-row .panel {
+                /*float: none;*/
+                display: table-cell;
+                vertical-align: top;
+            }
+            .dropdown .parsechar{
+                display: inline-block;
+            }
+
+            .hanzi {
+                position: relative;
+                display: inline-block;
+            }
+            .hanzi p{
+                display: inline-block;
+                padding: 2px;
+            }
+            .hanzi p:hover{
+                background: rgb(200,0,200);
+            }
+            .otherhanzi{
+                /*visibility: hidden;*/
+                position: absolute;
+                display: none;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            }
+            .hanzi:hover .otherhanzi{
+                /*visibility: visible;*/
+                display: block;
+            }
+            .otherhanzi a{
+                color: black;
+                padding: 2px;
+                text-decoration: none;
+                display: block;
+            }
+
+
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+        </div>
+        
+        <div class="container">
+            <br>
+            <h1>擬音互查</h1>
+            <br>
+            <!-- <form> -->
+            <div class="row" id="my-row">
+<!--                 <textarea rows="4" class="span5" style="resize: none;"></textarea>
+                <textarea class="span1" style="visibility:hidden;"></textarea>
+                <textarea rows="4" class="span5" style="resize: none;" readonly="True"></textarea> -->
+                <div class="span5 panel">
+                    <div class="btn-group" id="src">
+                        <button class="btn" id="seleted" style="width:100px;"></button>
+                        <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                        </ul>
+                    </div>
+                    <button class="btn" style="display:inline;float:right;"><i class="icon-retweet"></i></button>
+                    <br></br>
+                    <textarea rows="4" class="dofull" id="searchText"></textarea>
+                </div>
+                <div class="span1 panel"></div>
+                <div class="span5 panel">
+                    <div class="btn-group" id="dst">
+                        <button class="btn" id="seleted" style="width:100px;"></button>
+                        <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                          <!-- <li class="divider"></li> -->
+                        </ul>
+                    </div>
+                    <br></br>
+                    <!-- <textarea rows="4" class="span5 juy dofull" readonly="True" id="resultText"></textarea> -->
+                    <div style="background-color:rgb(200,200,200);" id="resultText">
+                        <!-- <a onmouseover="sl(‘西‘)" onmouseout="cl()" href="#">西</a> -->
+<!--                         <div class="dropdown parsechar">
+                            <p class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">我</p>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">我</a><li>
+                                <li><a href="#">我</a><li>
+                                <li><a href="#">我</a><li>
+                            </ul>
+                        </div>
+                        <div class="hanzi">
+                            <p>是</p>
+                            <div class="otherhanzi">
+                                <a href="#">是</a>
+                                <a href="#">是</a>
+                                <a href="#">是</a>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <!-- </form> -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-default" onclick="someFunc()">翻  譯</button>
+            </div>
+        </div>
+    </body>
+    <script>
+        var langList = ["中古羅馬","中古鄭張","上古鄭張","漢  字"];
+        var codeList = ["zgys","zgzz","sgzz","hanzi"];
+        window.onload = function(){
+            Array.prototype.map.call(document.querySelectorAll(".btn-group .dropdown-menu"),function(m) {
+                for(idx in langList){
+                    var _li,_a;
+                    _li= document.createElement("li");
+                    _a =document.createElement("a");
+                    _a.innerHTML=langList[idx];
+                    _li.appendChild(_a);
+                    m.appendChild(_li);
+                }
+                if(m.parentNode.id=="src"){
+                    m.parentNode.querySelector("#seleted").innerHTML = langList[0];
+                }
+                if(m.parentNode.id=="dst"){
+                    m.parentNode.querySelector("#seleted").innerHTML = langList[3];
+                }
+
+                Array.prototype.map.call(m.querySelectorAll("li"),function(l){
+                    //把默认选项的选择按钮置灰
+                    if(l.querySelector("a").innerHTML==m.parentNode.querySelector("#seleted").innerHTML){
+                        l.className="disabled"
+                    }
+                    l.onclick = function(){
+                        groupId= m.parentNode.id;
+                        langId = l.querySelector("a").innerHTML;
+                        //如果dst和src将要选中的项相同，则把dst和src的当前值交换
+                        if(groupId=="src"){
+                            if(document.querySelector("#dst").querySelector("#seleted").innerHTML==langId){
+                                selectAlanguage("dst",document.querySelector(".btn-group#src").querySelector("#seleted").innerHTML)
+                            }
+                        }
+                        if(groupId=="dst"){
+                            sl = document.querySelector("#src").querySelector("#seleted").innerHTML;
+                            if(sl==langId){
+                                selectAlanguage("src",document.querySelector(".btn-group#dst").querySelector("#seleted").innerHTML)
+                            }
+                        }
+                        selectAlanguage(groupId, langId);
+                    }
+                });
+            });
+
+            console.log(document.querySelector("#searchText").offsetWidht)
+            document.querySelector("#resultText").style.height = "100px";
+        };
+
+        function someFunc(){
+            var sendmsg = document.querySelector("#searchText").value;
+            var srclang,dstlang;
+            for(idx in langList){
+                var s = langList[parseInt(idx)];
+                // console.log(document.querySelector("#src").querySelector("#seleted").innerHTML+","+s)
+                if(document.querySelector("#src").querySelector("#seleted").innerHTML==s){
+                    srclang=codeList[idx];
+                }
+                if(document.querySelector("#dst").querySelector("#seleted").innerHTML==s){
+                    dstlang=codeList[idx];
+                }
+            }
+            var xmlhttp=new XMLHttpRequest();
+            xmlhttp.onreadystatechange=function()
+            {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+                {
+                    // document.querySelector("#resultText").innerHTML=xmlhttp.responseText;
+                    document.querySelector("#resultText").innerHTML="";
+                    var astr = xmlhttp.responseText;
+                    zilist = JSON.parse(astr)["hanzi"];
+                    for(idx in zilist){
+                        drophead = document.createElement("div");
+                        drophead.className = "dropdown parsechar";
+                        drophead.style.display = "inline-block";
+ 
+                        dropzi = document.createElement("p");
+                        dropzi.className = "dropdown-toggle";
+                        dropzi.setAttribute("data-toggle","dropdown");
+                        dropzi.setAttribute("data-hover","dropdown");
+                        if(zilist[idx].length>0)
+                            dropzi.innerHTML = zilist[idx][0];
+                        drophead.appendChild(dropzi)
+
+                        if(zilist[idx].length>1){
+                            aul = document.createElement("ul");
+                            aul.className="dropdown-menu";
+                            drophead.appendChild(aul);
+                            for(zi in zilist[idx]){
+                                if(zi==0) continue;
+                                ali = document.createElement("li");
+                                aa = document.createElement("a");
+                                aa.innerHTML = zilist[idx][zi];
+                                aul.appendChild(aa);
+                            }
+                        }
+                        document.querySelector("#resultText").appendChild(drophead);
+                    }
+                    console.log(document.querySelector("#resultText").innerHTML);
+                }
+            }
+            xmlhttp.open("POST","search?text="+sendmsg+"&srclang="+srclang+"&dstlang="+dstlang,true);
+            xmlhttp.send();
+            // var outputText = document.querySelector("textarea")
+            // outputText.value = "onclicked"
+        }
+    </script>
+    <script>
+        function selectAlanguage(group,lang){
+            var m = document.querySelector("#"+group);
+            var lilist= m.querySelector(".dropdown-menu").querySelectorAll("li");
+            var lilen = lilist.length;
+            for(i=0;i<lilen;i++){
+                if(lilist[i].querySelector("a").innerHTML!=lang){
+                    lilist[i].className="";
+                }else{
+                    lilist[i].className="disabled";
+
+                    m.querySelector("#seleted").innerHTML = lang;
+                }
+            }
+        }
+    </script>
+</html>
