@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- <script src="{{ url_for('static',filename='js/zhengju.js') }}" type="text/javascript"></script> -->
+
+<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="/static/js/zhengju.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="{{ url_for('static',filename='css/zhengju.css') }}">
+<div class="container">
+    <div class="page-header">
+        <h1 class="setCenter">整  句  檢  索</h1>
+    </div>
+    <div class="row" id="my-row">
+        <div class="span5 panel">
+            <div class="btn-group" id="src">
+                <button class="btn" id="seleted" style="width:100px;"></button>
+                <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                </ul>
+            </div>
+            <button class="btn" style="display:inline;float:right;"><i class="icon-retweet"></i></button>
+            <br></br>
+            <textarea rows="4" class="dofull" id="searchText"></textarea>
+        </div>
+        <div class="span1 panel"></div>
+        <div class="span5 panel">
+            <div class="btn-group" id="dst">
+                <button class="btn" id="seleted" style="width:100px;"></button>
+                <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                <ul class="dropdown-menu">
+
+                </ul>
+            </div>
+            <br></br>
+            <div style="background-color:rgb(240,240,240);" id="resultText">
+            </div>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button type="button" class="btn btn-default" onclick="transCharacter()">翻  譯</button>
+    </div>
+</div>
+{% endblock %}

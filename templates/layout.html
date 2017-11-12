@@ -1,0 +1,52 @@
+<!doctype html>
+<!-- <html>
+  <head> -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TogsKlogqala的漢字古今中外音</title>
+    <link rel=stylesheet type=text/css href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <style type="text/css">
+      body{
+        padding-top: 60px;
+        font-family: "Helvetica Neue",Helvetica,Arial,Minglan,"Hiragino Kaku Gothic Pro","黑體-繁",MingLiU,sans-serif;
+      }
+      .setCenter{
+        /*margin:0 auto;*/
+        text-align:center;
+        /*display: flex;*/
+      }
+      .setblank{
+        margin: 0 auto;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 500px;
+        /*text-align: left;*/
+        /*display: flex;*/
+        /*-webkit-align-items: center;*/
+        /*align-items: center;*/
+        /*-webkit-justify-content: center;*/
+            /*justify-content: center;*/
+      }
+      .input-append input{
+        /*height: 40px;*/
+        font-size: 30px;
+        line-height: 32px;
+      }
+      input[type="text"]{
+        height: 34px;
+      }
+    </style>
+    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <!-- </head> -->
+<div class="navbar navbar-fixed-top navbar-inverse">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="/">TogsKlogqala的漢字古今中外音</a>
+      <ul class="nav">
+        <li><a href="/">單字檢索</a></li>
+        <li><a href="/ju">整句檢索</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% block body %}{% endblock %}

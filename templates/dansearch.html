@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% block body %}
+  	<div class="container-fluid">
+  		<div class="row-fluid">
+  			<div class="span10 offset1">
+  				<div class="page-header">
+  					<h1 class="setCenter">單  字  檢  索</h1>
+  				</div>
+  				<!-- 檢索 -->
+  				<form class="form-horizontal setCenter" action="/dan">
+  					<fieldset>
+  						<div class="control-group">
+							<div class="input-append">
+							  <input class="input-xlarge" id="zi" name="zi" type="text">
+							  <button class="btn btn-primary btn-large" type="submit">檢 索</button>
+							  
+  						</div>
+  						<div class="control-group"></div>
+  						<div class="control-group">
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="hanzi" {% if opt is not defined or opt=="hanzi" %}checked{% endif %}>
+					            漢字
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="sheng" {% if opt=='sheng' %}checked{% endif %}>
+					            聲母
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="yun" {% if opt=='yun' %}checked{% endif %}>
+					            韻母
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="xiaoyun" {% if opt=='xiaoyun' %}checked{% endif %}>
+					            小韻
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="pychn">
+					            拼音
+					          </label>					       
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="zgys">
+					            中古拼音
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="jpn">
+					            日語
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="kor">
+					            韓語
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="vnm">
+					            越南
+					          </label>						          				      
+				        </div>
+  					</fieldset>
+  				</form>
+  				{% if err==-1 %}
+  					<div class="alert alert-error setblank">輸入長度錯誤！</div>
+  				{% else %}
+	  				{% if results is not defined %}
+	  				{% else %}
+						<table class="table table-bordered table-condensed">
+							<tbody>
+								<tr>
+									<th>漢字</th>
+									<th>小韻</th>
+									<th>反切</th>
+									<th>聲母</th>
+									<th>韻母</th>
+									<th>調</th>
+									<th>等</th>
+									<th>呼</th>
+									<th>攝</th>
+									<th>中古鄭張</th>
+									<th>中古拼音</th>
+									<th>上古聲符</th>
+									<th>上古韻部</th>
+									<th>上古鄭張</th>
+									<th>拼音</th>
+									<th>日語漢音</th>
+									<th>日語吳音</th>
+									<th>朝鮮</th>
+									<th>越南</th>
+								</tr>
+								{% for entry in results %}
+									<tr>
+										<td>{% if entry.zi is defined %} {{entry.zi}}{% endif %}</td>
+										<td>{% if entry.xiaoyun is defined %}{{entry.xiaoyun}}{% endif %}</td>
+										<td>{% if entry.fanqie is defined %}{{entry.fanqie}}{% endif %}</td>
+										<td>{% if entry.sheng is defined %}{{entry.sheng}}{% endif %}</td>
+										<td>{% if entry.yun is defined %}{{entry.yun}}{% endif %}</td>
+										<td>{% if entry.diao is defined %}{{entry.diao}}{% endif %}</td>
+										<td>{% if entry.deng is defined %}{{entry.deng}}{% endif %}</td>
+										<td>{% if entry.hu is defined %}{{entry.hu}}{% endif %}</td>
+										<td>{% if entry.she is defined %}{{entry.she}}{% endif %}</td>
+										<td>{% if entry.zgzz is defined %}{{entry.zgzz}}{% endif %}</td>
+										<td>{% if entry.zgys is defined %}{{entry.zgys}}{% endif %}</td>
+										<td>{% if entry.shengfu is defined %}{{entry.shengfu}}{% endif %}</td>
+										<td>{% if entry.yunbu is defined %}{{entry.yunbu}}{% endif %}</td>
+										<td>{% if entry.sgzz is defined %}{{entry.sgzz}}{% endif %}</td>
+										<td>{% if entry.pinyin is defined %}{{entry.pinyin}}{% endif %}</td>
+										<td>{% if entry.han is defined %}{{entry.han}}{% endif %}</td>
+										<td>{% if entry.wu is defined %}{{entry.wu}}{% endif %}</td>
+										<td>{% if entry.kr is defined %}{{entry.kr}}{% endif %}</td>
+										<td>{% if entry.vn is defined %}{{entry.vn}}{% endif %}</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+					    </table>
+				    {% endif %}
+			    {% endif %}
+  			</div>
+  		</div>
+  	</div>
+{% endblock %}

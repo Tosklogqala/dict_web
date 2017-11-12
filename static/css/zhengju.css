@@ -1,0 +1,57 @@
+/* tag.class且; .class .class下级; .class,.class都*/
+textarea.juy {
+    cursor: text;
+    border-style: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+/* 令textarea铺满所在的div*/
+.dofull{
+    resize: none;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+/*据说可以解决row高度不一致的问题。然而textarea有边*/
+#my-row {
+    display: table;
+}
+
+#my-row .panel {
+    /*float: none;*/
+    display: table-cell;
+    vertical-align: top;
+}
+.dropdown .parsechar{
+    display: inline-block;
+}
+
+.hanzi {
+    position: relative;
+    display: inline-block;
+}
+.hanzi p{
+    display: inline-block;
+    padding: 2px;
+}
+.hanzi p:hover{
+    background: rgb(200,0,200);
+}
+.otherhanzi{
+    /*visibility: hidden;*/
+    position: absolute;
+    display: none;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.hanzi:hover .otherhanzi{
+    /*visibility: visible;*/
+    display: block;
+}
+.otherhanzi a{
+    color: black;
+    padding: 2px;
+    text-decoration: none;
+    display: block;
+}
