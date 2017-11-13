@@ -1,7 +1,6 @@
 # coding=utf-8
 from bs4 import BeautifulSoup
 import requests
-import pymysql
 
 import hashlib
 import re
@@ -27,7 +26,7 @@ HANVIET_PATH =os.path.join(PROJ_PATH,"hanviet")
 
 EB_PATH = PROJ_PATH
 
-SQL_URL = ""+os.path.join(PROJ_PATH,"data")+"\\cl.db"
+SQL_URL = ""+os.path.join(PROJ_PATH,"data","cl.db")
 
 # class myTools():
 	# @staticmethod
