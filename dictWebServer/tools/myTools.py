@@ -13,20 +13,20 @@ YTENX_GY_NAME = 'ytenx_gy_xiaoyun_{0}'
 YTENX_SG_NAME = 'ytenx_sg_zibiao_{0}'
 
 # 现在这个路径与调用的py所在的路径有关。以后要改成myTools所在的路径
-PROJ_PATH = sys.path[0]
+PROJ_PATH = os.path.split(os.path.realpath(__file__))[0] 
 
-ZDIC_PATH = os.path.join(PROJ_PATH,"zdic")
+# ZDIC_PATH = os.path.join(PROJ_PATH,"zdic")
 
-YTENX_PATH = os.path.join(PROJ_PATH,"ytenx")
-YTENX_GY_PATH = os.path.join(YTENX_PATH,"gy")
-YTENX_SG_PATH = os.path.join(YTENX_PATH,"sg")
+# YTENX_PATH = os.path.join(PROJ_PATH,"ytenx")
+# YTENX_GY_PATH = os.path.join(YTENX_PATH,"gy")
+# YTENX_SG_PATH = os.path.join(YTENX_PATH,"sg")
 
-NAVER_PATH = os.path.join(PROJ_PATH,"naver")
-HANVIET_PATH =os.path.join(PROJ_PATH,"hanviet")
+# NAVER_PATH = os.path.join(PROJ_PATH,"naver")
+# HANVIET_PATH =os.path.join(PROJ_PATH,"hanviet")
 
-EB_PATH = PROJ_PATH
+# EB_PATH = PROJ_PATH
 
-SQL_URL = ""+os.path.join(PROJ_PATH,"data","cl.db")
+SQL_URL = ""+os.path.join(PROJ_PATH,"..","data","cl.db")
 
 # class myTools():
 	# @staticmethod

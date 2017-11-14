@@ -1,31 +1,19 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 29 17:27:28 2017
+from dictWebServer import app
 
-@author: Administrator
-"""
-import io
-import sys
-# sys.path.append("..")
-
-from datetime import datetime
 import flask
 from flask import jsonify
-
-# import pymysql
-from dbModel import dbmodel
+from .dbModel import dbmodel
 import collections
 import re
+from .tools import myTools
 
-import myTools
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
-app = flask.Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
+import os
 
 @app.route('/',methods=['GET'])
 def index():
 	print("index")
+	# print(os.path.split(os.path.realpath(__file__)))
+	# print(myTools.SQL_URL)
 	# return flask.render_template('trans.html')
 	return flask.render_template('dansearch.html')
 
@@ -320,8 +308,3 @@ def safeAppend(dst,src,dic):
 		return dic[dst]+","+src
 	else:
 		return src
-
-
-if __name__ == '__main__':
-    # app.run(debug=True,use_reloader=False)
-    app.run(host='0.0.0.0')

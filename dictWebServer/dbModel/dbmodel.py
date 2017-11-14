@@ -4,7 +4,7 @@ from sqlalchemy.types import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,sessionmaker
 
-import myTools
+from ..tools import myTools
 
 # 创建对象的基类:
 dbmodel = declarative_base()
