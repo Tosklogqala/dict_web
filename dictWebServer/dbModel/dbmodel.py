@@ -1,4 +1,4 @@
-# 导入:
+# -*- coding: utf-8 -*-
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.types import *
 from sqlalchemy.ext.declarative import declarative_base
@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship,sessionmaker
 
 from ..tools import myTools
 
-# 创建对象的基类:
+
 dbmodel = declarative_base()
 
 # hanzi

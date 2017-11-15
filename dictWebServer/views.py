@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from dictWebServer import app
 
 import flask
@@ -5,9 +6,10 @@ from flask import jsonify
 from .dbModel import dbmodel
 import collections
 import re
-from .tools import myTools
+from .tools import myTools as tl
 
 import os
+
 
 @app.route('/',methods=['GET'])
 def index():
@@ -66,7 +68,7 @@ def sentence():
 
 def doTranslate(txt,src,dst,trans):
 	try:
-		session = dbmodel.getSession(myTools.SQL_URL)
+		session = dbmodel.getSession(tl.SQL_URL)
 		restxt= str.split(txt," ")
 		for zi in restxt:
 			results = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.zgys==zi).all()
@@ -86,7 +88,7 @@ def danHanzi(zi):
 	if len(zi)<1 or len(zi)>1:
 		return -1,[]
 	
-	session = dbmodel.getSession(myTools.SQL_URL)
+	session = dbmodel.getSession(tl.SQL_URL)
 	zilist = session.query(dbmodel.hanzi).filter(dbmodel.hanzi.zi==zi).all()
 	results = parseFromZiList(zilist)
 	session.close()
@@ -96,7 +98,7 @@ def danSheng(zi,offset):
 	if len(zi)<1 or len(zi)>1:
 		return -1,[]
 
-	session = dbmodel.getSession(myTools.SQL_URL)
+	session = dbmodel.getSession(tl.SQL_URL)
 	zglist = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.sheng==zi).order_by(dbmodel.zgchn.id).offset(offset).limit(10)
 	zilist = []
 	[zilist.append(yun.hanzi) for yun in zglist if not yun.hanzi in zilist]
@@ -108,7 +110,7 @@ def danYun(zi,offset):
 	if len(zi)<1 or len(zi)>1:
 		return -1,[]
 
-	session = dbmodel.getSession(myTools.SQL_URL)
+	session = dbmodel.getSession(tl.SQL_URL)
 	zglist = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.yun==zi).all()
 	zilist = []
 	[zilist.append(yun.hanzi) for yun in zglist if not yun.hanzi in zilist]
@@ -120,7 +122,7 @@ def danXiaoyun(zi):
 	if len(zi)<1 or len(zi)>1:
 		return -1,[]
 
-	session = dbmodel.getSession(myTools.SQL_URL)
+	session = dbmodel.getSession(tl.SQL_URL)
 	zglist = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.xiaoyun==zi).all()
 	zilist = []
 	[zilist.append(yun.hanzi) for yun in zglist if not yun.hanzi in zilist]
@@ -153,158 +155,87 @@ def parseFromZiList(zilist):
 
 			resultOfZi.append(line)
 
-		size1 = len(resultOfZi)
-		for j,sgy in enumerate(one.sg):
-			# 若不存在中古韻，建立上古音的行
-			if size1 == 0:
-				line={}
-				line['shengfu'] =sgy.shengfu
-				line['yunbu'] = sgy.yunbu
-				line['sgzz'] = sgy.sgzz
-				resultOfZi.append(line)
-			else:
-				# 若只有一個中古韻，一個上古音。則顯示在一行。
-				# 若有多個中古韻，一個上古音。則上古音顯示在第一行
-				if len(one.sg)==1:
-					resultOfZi[0]['shengfu']=sgy.shengfu
-					resultOfZi[0]['yunbu']=sgy.yunbu
-					resultOfZi[0]['sgzz']=sgy.sgzz
-				else:
-					# 若存在中古韻，且有多個上古音。則能匹配的填在對應的後面。多於1條則加...
-					found=False
-					for x in range(0,size1):
-						if resultOfZi[x]['xiaoyun']==sgy.xiaoyun:
-							resultOfZi[x]['shengfu'] = safeAppend('shengfu',sgy.shengfu,resultOfZi[x])
-							resultOfZi[x]['yunbu'] = safeAppend('yunbu',sgy.yunbu,resultOfZi[x])
-							resultOfZi[x]['sgzz'] = safeAppend('sgzz',sgy.sgzz,resultOfZi[x])
-							found=True
-							break
-					# 若不能匹配到中古韻。則填在第一行。多於1條則加... 有可能能匹配到第一行的顯示不出來
-					if not found:
-						resultOfZi[0]['shengfu'] = safeAppend('shengfu',sgy.shengfu,resultOfZi[0])
-						resultOfZi[0]['yunbu'] = safeAppend('yunbu',sgy.yunbu,resultOfZi[0])
-						resultOfZi[0]['sgzz'] = safeAppend('sgzz',sgy.sgzz,resultOfZi[0])
+		if len(one.sg)>0:
+			langAddToColumn(one.sg,resultOfZi,addSg)
 
-		#0行時添一行。1行時填在第一行。多行時匹配中古韻。匹配不到的都填在第一行。加..
 		if len(one.py)>0:
-			size2 = len(resultOfZi)
-			if size2==0:
-				line={}
-				for pyy in one.py:
-					line['pinyin'] = safeAppend('pinyin',pyy.pinyin,line)
-				resultOfZi.append(line)
-			elif size2==1:
-				for pyy in one.py:
-					resultOfZi[0]['pinyin'] = safeAppend('pinyin',pyy.pinyin,resultOfZi[0])
-					pass
-			elif size2>1:
-				for pyy in one.py:
-					found=False
-					for x in range(0,size2):
-						if resultOfZi[x]['xiaoyun']==pyy.xiaoyun:
-							resultOfZi[x]['pinyin']=safeAppend('pinyin',pyy.pinyin,resultOfZi[x])
-							found=True
-							break
-					if not found:
-						resultOfZi[0]['pinyin'] = safeAppend('pinyin',pyy.pinyin,resultOfZi[0])
+			langAddToColumn(one.py,resultOfZi,addPy)
 
 		if one.jpn_id != None:
-			size3 = len(resultOfZi)
-			if size3==0:
-				if len(one.jp.wuhan)>0:
-					line={}
-					for jpwh in one.jp.wuhan:
-						line['wu'] = safeAppend('wu',jpwh.wu,line)
-						line['han'] = safeAppend('han',jpwh.han,line)
-					resultOfZi.append(line)
-			elif size3==1:
-				for jpwh in one.jp.wuhan:
-					resultOfZi[0]['wu'] = safeAppend('wu',jpwh.wu,resultOfZi[0])
-					resultOfZi[0]['han'] = safeAppend('han',jpwh.han,resultOfZi[0])
-			elif size3>1:
-				for jpwh in one.jp.wuhan:
-					found=False
-					for x in range(0,size3):
-						if resultOfZi[x]['xiaoyun']==jpwh.xiaoyun:
-							resultOfZi[x]['wu']=safeAppend('wu',jpwh.wu,resultOfZi[x])
-							resultOfZi[x]['han']=safeAppend('han',jpwh.han,resultOfZi[x])
-							found=True
-							break
-					if not found:
-						resultOfZi[0]['wu'] = safeAppend('wu',jpwh.wu,resultOfZi[0])
-						resultOfZi[0]['han'] = safeAppend('han',jpwh.han,resultOfZi[0])
+			langAddToColumn(one.jp.wuhan,resultOfZi,addJp)
 
 		if len(one.kr)>0:
-			size4 = len(resultOfZi)			
-			if size4==0:
-				line={}
-				for kryx in one.kr[0].yinxun:
-					ky=""
-					if kryx.liu == "":
-						ky=kryx.yin
-					else:
-						ky=kryx.yin+"("+kryx.liu+")"
-					line['kr'] = safeAppend('kr',ky,line)
-				resultOfZi.append(line)
-			elif size4==1:
-				for kryx in one.kr[0].yinxun:
-					ky=""
-					if kryx.liu == "":
-						ky=kryx.yin
-					else:
-						ky=kryx.yin+"("+kryx.liu+")"
-					resultOfZi[0]['kr'] = safeAppend('kr',ky,resultOfZi[0])
-			elif size4>1:
-				for kryx in one.kr[0].yinxun:
-					found=False
-					for x in range(0,size4):
-						if resultOfZi[x]['xiaoyun']==kryx.xiaoyun:
-							ky=""
-							if kryx.liu == "":
-								ky=kryx.yin
-							else:
-								ky=kryx.yin+"("+kryx.liu+")"
-							resultOfZi[x]['kr']=safeAppend('kr',ky,resultOfZi[x])
-							found=True
-							break
-					if not found:
-						ky=""
-						if kryx.liu == "":
-							ky=kryx.yin
-						else:
-							ky=kryx.yin+"("+kryx.liu+")"
-						resultOfZi[0]['kr'] = safeAppend('kr',ky,resultOfZi[0])
+			langAddToColumn(one.kr[0].yinxun,resultOfZi,addKr)
 
 		if len(one.vn)>0:
-			size5 = len(resultOfZi)	
-			if size5==0:
-				line={}
-				for vny in one.vn[0].yin:
-					line['vn'] = safeAppend('vn',vny.yin,line)
-				resultOfZi.append(line)
-			elif size5==1:
-				for vny in one.vn[0].yin:
-					resultOfZi[0]['vn'] = safeAppend('vn',vny.yin,resultOfZi[0])
-			elif size5>1:
-				for vny in one.vn[0].yin:
-					found=False
-					for x in range(0,size5):
-						if resultOfZi[x]['xiaoyun']==vny.xiaoyun:
-							resultOfZi[x]['vn']=safeAppend('vn',vny.yin,resultOfZi[x])
-							found=True
-							break
-					if not found:
-						resultOfZi[0]['vn'] = safeAppend('vn',vny.yin,resultOfZi[0])
+			langAddToColumn(one.vn[0].yin,resultOfZi,addVn)
 
 		[results.append(y) for y in resultOfZi]
 
 	return results
 
+def addSg(entry,ary,bold=True):
+	safeAppend('shengfu',entry.shengfu,ary)
+	safeAppend('yunbu',entry.yunbu,ary)
+	safeAppend('sgzz',entry.sgzz,ary)
+
+def addPy(entry,ary,bold=True):
+	if bold==True:
+		safeAppend('pinyin',entry.pinyin,ary)
+	else:
+		safeAppend('pinyin',"<i>"+entry.pinyin+"</i>",ary)
+
+def addJp(entry,ary,bold=True):
+	if bold==True:
+		safeAppend('wu',entry.wu,ary)
+		safeAppend('han',entry.han,ary)
+	else:
+		safeAppend('wu',"<i>"+entry.wu+"</i>",ary)
+		safeAppend('han',"<i>"+entry.han+"</i>",ary)
+
+def addKr(entry,ary,bold=True):
+	ky=""
+	if entry.liu == "":
+		ky=entry.yin
+	else:
+		ky=entry.yin+"("+entry.liu+")"
+	safeAppend('kr',ky,ary)
+
+def addVn(entry,ary,bold=True):
+	safeAppend('vn',entry.yin,ary)
+
+def langAddToColumn(lang,dic,func):
+	size = len(dic)
+# 若不存在中古韻，建立新的行来填写本语言信息
+	if size == 0:
+		line={}
+		for entry in lang:
+			func(entry,line)
+		dic.append(line)
+# 若只有一個中古韻，則顯示在一行。（也许上古多于一行时，应建立新的行？）
+	elif size==1:
+		for entry in lang:
+			#填在第一行而不匹配当行中古韵的读音，用特殊字体标识
+			if dic[0]['xiaoyun']==entry.xiaoyun:
+				func(entry,dic[0])
+			else:
+				func(entry,dic[0],False)
+	elif size>1:
+# 若存在多个中古韻，則能匹配的填在對應的後面。
+		for entry in lang:
+			found=False
+			for x in range(0,size):
+				if dic[x]['xiaoyun']==entry.xiaoyun:
+					func(entry,dic[x])
+					found=True
+					break
+# 若不能匹配到中古韻。則填在第一行。
+			#填在第一行而不匹配当行中古韵的读音，用特殊字体标识
+			if not found:
+				func(entry,dic[0],False)
+
 def safeAppend(dst,src,dic):
 	if dst in dic.keys() and dic[dst]!="":
-		# if dic[dst].find("...")>=0:
-		# 	return dic[dst]
-		# else:
-		return dic[dst]+","+src
+		dic[dst] = dic[dst] + "," + src
 	else:
-		return src
+		dic[dst] = src

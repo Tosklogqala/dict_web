@@ -12,7 +12,7 @@ import io
 YTENX_GY_NAME = 'ytenx_gy_xiaoyun_{0}'
 YTENX_SG_NAME = 'ytenx_sg_zibiao_{0}'
 
-# 现在这个路径与调用的py所在的路径有关。以后要改成myTools所在的路径
+# os.path[0]这个路径与调用的py所在的路径有关。现在这样写则是本文件所在路径
 PROJ_PATH = os.path.split(os.path.realpath(__file__))[0] 
 
 # ZDIC_PATH = os.path.join(PROJ_PATH,"zdic")

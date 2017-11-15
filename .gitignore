@@ -4,3 +4,8 @@ translate
 hanviet
 笔记
 __pycache__
+dictWebServer/templates/可变下拉框.html
+dictWebServer/templates/pure.html
+dictWebServer/templates/search.html
+dictWebServer/templates/test.html
+dictWebServer/templates/trans.html

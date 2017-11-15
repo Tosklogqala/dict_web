@@ -84,6 +84,7 @@
 									<th>朝鮮</th>
 									<th>越南</th>
 								</tr>
+								{% autoescape false %}
 								{% for entry in results %}
 									<tr>
 										<td>{% if entry.zi is defined %} {{entry.zi}}{% endif %}</td>
@@ -107,8 +108,21 @@
 										<td>{% if entry.vn is defined %}{{entry.vn}}{% endif %}</td>
 									</tr>
 								{% endfor %}
+								{% endautoescape %}
 							</tbody>
 					    </table>
+
+					    <div class="pagination">
+					    	<ul>
+					    		<li class="disabled"><a href='/'> 上一頁 </a></li>
+					    		<li class="disabled"><a href='/'> 1 </a></li>
+					    		<li class="active"><a href='/'> 2 </a></li>
+					    		<li class="active"><a href='/'> 3 </a></li>
+					    		<li class="disabled"><a href='/'> ... </a></li>
+					    		<li class="active"><a href='/'> 10 </a></li>
+					    		<li class="active"><a href='/'> 下一頁 </a></li>
+					    	</ul>
+					    </div>
 				    {% endif %}
 			    {% endif %}
   			</div>
