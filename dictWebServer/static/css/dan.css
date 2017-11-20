@@ -1,0 +1,38 @@
+.setCenter{
+  /*margin:0 auto;*/
+  text-align:center;
+  /*display: flex;*/
+}
+.setblank{
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 500px;
+  /*text-align: left;*/
+  /*display: flex;*/
+  /*-webkit-align-items: center;*/
+  /*align-items: center;*/
+  /*-webkit-justify-content: center;*/
+      /*justify-content: center;*/
+}
+.input-append input{
+  /*height: 40px;*/
+  font-size: 30px;
+  line-height: 32px;
+}
+input[type="text"]{
+  height: 34px;
+}
+.pagination{
+  text-align: right;
+}
+/*fade*/
+b.f{
+  font-weight: normal;
+  color: #959595;
+}
+/*highlight*/
+b.h{
+  /*font-weight: normal;*/
+  /*color: #959595;*/
+}

@@ -1,0 +1,209 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="container">
+	<div class="page-header">
+        <h1>{{results.zi}}<small> 檢索漢字</small></h1>
+    </div>
+
+	<div class="row">
+		<div class="span12">
+		    <h2>中古</h2>
+		    <table class="table table-bordered table-condensed">
+	    	{% if results.zg|length>0 %}
+				<tr>
+					<th>字頭</h>
+					<th>小韻</th>
+					<th>反切</th>
+					<th>聲母</th>
+					<th>韻母</th>
+					<th>韻目</th>
+					<th>調</th>
+					<th>等</th>
+					<th>呼</th>
+					<th>攝</th>
+					<th>中古鄭張</th>
+					<th>中古拼音</th>
+					<th>註解</th>
+				</tr>
+			{% endif %}
+			{% for entry in results.zg %}
+				<tr>
+					<td>{{results.zi}}</td>
+					<td>{{ entry.xiaoyun }}</td>
+					<td>{{ entry.fanqie_1+entry.fanqie_2 }}</td>
+					<td>{{ entry.sheng }}</td>
+					<td>{{ entry.yun }}</td>
+					<td>{{ entry.yunmu }}</td>
+					<td>{{ entry.diao }}</td>
+					<td>{{ entry.deng }}</td>
+					<td>{{ entry.hu }}</td>
+					<td>{{ entry.she }}</td>
+					<td>{{ entry.zgzz }}</td>
+					<td>{{ entry.zgys }}</td>
+					<td>{{ entry.mean }}</td>
+				</tr>
+			{% endfor %}
+		    </table>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="span6">
+		    <h2>上古</h2>
+		    <table class="table table-bordered table-condensed">
+		    	{% if results.sg|length>0 %}
+					<tr>
+						<th>上古聲符</th>
+						<th>上古韻部</th>
+						<th>對應廣韻小韻</th>
+						<th>上古鄭張</th>
+						<!-- <th>註解</th> -->
+					</tr>
+				{% endif %}
+				{% for entry in results.sg %}
+					<tr>
+						<td>{{ entry.shengfu }}</td>
+						<td>{{ entry.yunbu }}</td>
+						<td>{{ entry.xiaoyun }}</td>
+						<td>{{ entry.sgzz }}</td>
+						<!-- <td>註解</td> -->
+					</tr>
+				{% endfor %}
+		    </table>
+		</div>
+	</div>
+
+	<h2>拼音</h2>
+	<p>
+		{% for entry in results.py %}
+			{% if loop.index != loop.length %}
+				{{ entry.pinyin }}
+			{% else %}
+				{{ entry.pinyin }}
+			{% endif %}
+		{% endfor %}
+	</p>
+	<br>
+	
+    <h2>日語</h2>
+	<div class="row">
+		<div class="span4">	
+		    <table class="table table-bordered table-condensed">
+		    	{% if results.jp.wuhan|length>0 %}
+				    <tr>
+						<th>漢音</th>
+						<th>吳音</th>
+						<th>對應廣韻韻</th>
+					</tr>
+				{% endif %}
+				{% for entry in results.jp.wuhan %}
+					<tr>
+						<td>{{entry.han}}</td>
+						<td>{{entry.wu}}</td>
+						<td>{{entry.yun}}</td>
+					</tr>
+				{% endfor %}
+	    	</table>
+	    </div>
+	</div>
+	<div class="row">
+		<div class="span12">	
+		    <table class="table table-bordered table-condensed">
+		    	{% if results.jp.often is defined %}
+			    	<tr>
+						<td width="60">常用音訓</td>
+						<td>{{ results.jp.often }}</td>
+					</tr>
+				{% endif %}
+				{% if results.jp.tang is defined %}
+					<tr>			
+						<td width="60">唐音</td>
+						<td>{{results.jp.tang}}</td>
+					</tr>
+				{% endif %}
+				{% if results.jp.guan is defined %}
+					<tr>
+						<td width="60">慣音</td>
+						<td>{{results.jp.guan}}</td>
+					</tr>
+				{% endif %}
+				{% if results.jp.xun is defined %}
+					<tr>
+						<td width="60">訓讀</td>
+						<td>{{results.jp.xun}}</td>
+					</tr>
+				{% endif %}
+				{% if results.jp.mingfu is defined %}
+					<tr>
+						<td width="60">名付</td>
+						<td>{{results.jp.mingfu}}</td>
+					</tr>
+				{% endif %}
+				{% if results.jp.mean is defined %}
+					{% for entry in results.jp.mean %}
+						{% if loop.index == 1 %}
+							<tr>
+								<td width="60">意味</td>
+								<td>{{entry}}</td>
+							</tr>
+						{% else %}
+							<tr>
+								<td width="60"></td>
+								<td>{{entry}}</td>
+							</tr>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+		    </table>
+		</div>
+	</div>
+
+	<h2>韓語</h2>	
+	<div class="row">
+		<div class="span4">			    
+		    <table class="table table-bordered table-condensed">
+		    	{% if results.kr.yinxun|length>0 %}
+				    <tr>
+						<th>音讀</th>
+						<th>訓讀</th>
+					</tr>
+				{% endif %}
+				{% for entry in results.kr.yinxun %}
+					<tr>
+						<td>{{entry.yin}}{% if entry.liu != "" %}({{entry.liu}}){% endif %}</td>
+						<td>{{entry.xun}}</td>
+					</tr>
+				{% endfor %}
+	    	</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="span6">	
+		    <table class="table table-bordered table-condensed">
+		    	{% if results.kr.mean|length>0 %}
+			    	<tr>
+						<th>naver digital 漢字字典</th>
+					</tr>
+				{% endif %}
+		    	{% for entry in results.kr.mean %}
+			    	<tr>
+			    		<td>{{entry}}</td>
+			    	</tr>
+		    	{% endfor %}
+		    </table>
+		</div>
+	</div>
+
+	<h2>越南</h2>
+	<p>
+		{% for entry in results.vn.yin %}
+			{% if loop.index != loop.length %}
+				{{ entry.yin }}
+			{% else %}
+				{{ entry.yin }}
+			{% endif %}
+		{% endfor %}
+	</p>
+	<br>
+</div>
+{% endblock %}

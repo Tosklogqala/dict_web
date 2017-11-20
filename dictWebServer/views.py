@@ -6,7 +6,9 @@ from flask import jsonify
 from .dbModel import dbmodel
 import collections
 import re
+import json
 from .tools import myTools as tl
+from .tools import queryTools as qt
 
 import os
 
@@ -21,22 +23,45 @@ def index():
 
 @app.route('/dan',methods=['GET'])
 def dan():
-	print("dan")
 	zi = flask.request.args["zi"]
 	opt= flask.request.args["opt"]
-	# print(zi+";"+opt)
-	results=[]
-	err=0
-	if opt=="hanzi":
-		err,results = danHanzi(zi)
-	elif opt=="sheng":
-		err,results = danSheng(zi,0)
-	elif opt=="yun":
-		err,results = danYun(zi,0)
-	elif opt=="xiaoyun":
-		err,results = danXiaoyun(zi)
+	page = 1
+	if 'page' in flask.request.args:
+		page = int(flask.request.args['page'])
 
-	return flask.render_template('dansearch.html',err=err,results=results,opt=opt)
+	
+	ext={}
+	ext["zi"]=zi
+	ext["opt"]=opt
+	ext["curpage"]=page
+	ext["totalpage"]=1
+	ext["err"]=0
+
+	results=[]
+	if opt=="hanzi":
+		ext["err"],results = qt.queryTools().danHanzi(zi)
+		if ext["err"]==1:
+			return flask.render_template("zisearch.html",results=results)
+	elif opt=="sheng":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danSheng(zi,page)
+	elif opt=="yun":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danYun(zi,page)
+	elif opt=="xiaoyun":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danXiaoyun(zi,page)
+	elif opt=="pychn":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danPinyin(zi,page)
+	elif opt=="zgys":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danZgys(zi,page)
+	elif opt=="jpnwu":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danJpn(zi,page,"wu")
+	elif opt=="jpnhan":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danJpn(zi,page,"han")
+	elif opt=="kor":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danKor(zi,page)
+	elif opt=="vnm":
+		ext["err"],results,ext["totalpage"] = qt.queryTools().danVnm(zi,page)
+
+	return flask.render_template('dansearch.html',results=results,ext=ext)
 
 @app.route('/ju',methods=['GET'])
 def ju():
@@ -80,162 +105,6 @@ def doTranslate(txt,src,dst,trans):
 		print(e)
 		trans={}
 	finally:
-		pass
+		session.close()
 
 	return trans
-
-def danHanzi(zi):
-	if len(zi)<1 or len(zi)>1:
-		return -1,[]
-	
-	session = dbmodel.getSession(tl.SQL_URL)
-	zilist = session.query(dbmodel.hanzi).filter(dbmodel.hanzi.zi==zi).all()
-	results = parseFromZiList(zilist)
-	session.close()
-	return 0,results
-
-def danSheng(zi,offset):
-	if len(zi)<1 or len(zi)>1:
-		return -1,[]
-
-	session = dbmodel.getSession(tl.SQL_URL)
-	zglist = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.sheng==zi).order_by(dbmodel.zgchn.id).offset(offset).limit(10)
-	zilist = []
-	[zilist.append(yun.hanzi) for yun in zglist if not yun.hanzi in zilist]
-	results = parseFromZiList(zilist)
-	session.close()
-	return 0,results
-
-def danYun(zi,offset):
-	if len(zi)<1 or len(zi)>1:
-		return -1,[]
-
-	session = dbmodel.getSession(tl.SQL_URL)
-	zglist = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.yun==zi).all()
-	zilist = []
-	[zilist.append(yun.hanzi) for yun in zglist if not yun.hanzi in zilist]
-	results = parseFromZiList(zilist)
-	session.close()
-	return 0,results
-
-def danXiaoyun(zi):
-	if len(zi)<1 or len(zi)>1:
-		return -1,[]
-
-	session = dbmodel.getSession(tl.SQL_URL)
-	zglist = session.query(dbmodel.zgchn).filter(dbmodel.zgchn.xiaoyun==zi).all()
-	zilist = []
-	[zilist.append(yun.hanzi) for yun in zglist if not yun.hanzi in zilist]
-	results = parseFromZiList(zilist)
-	session.close()
-	return 0,results
-
-
-def parseFromZiList(zilist):
-	results = []
-	for one in zilist:
-		resultOfZi=[]
-		for zgy in one.zg:
-			line={}
-			if len(resultOfZi)==0:
-				line['zi']=one.zi
-			else:
-				line['zi']=""
-
-			line['xiaoyun']	= zgy.xiaoyun
-			line['fanqie'] 	= zgy.fanqie_1+zgy.fanqie_2
-			line['sheng']	= zgy.sheng
-			line['yun']		= zgy.yun
-			line['diao']	= zgy.diao
-			line['deng']	= zgy.deng
-			line['hu']		= zgy.hu
-			line['she'] 	= zgy.she
-			line['zgzz'] 	= zgy.zgzz
-			line['zgys'] 	= zgy.zgys
-
-			resultOfZi.append(line)
-
-		if len(one.sg)>0:
-			langAddToColumn(one.sg,resultOfZi,addSg)
-
-		if len(one.py)>0:
-			langAddToColumn(one.py,resultOfZi,addPy)
-
-		if one.jpn_id != None:
-			langAddToColumn(one.jp.wuhan,resultOfZi,addJp)
-
-		if len(one.kr)>0:
-			langAddToColumn(one.kr[0].yinxun,resultOfZi,addKr)
-
-		if len(one.vn)>0:
-			langAddToColumn(one.vn[0].yin,resultOfZi,addVn)
-
-		[results.append(y) for y in resultOfZi]
-
-	return results
-
-def addSg(entry,ary,bold=True):
-	safeAppend('shengfu',entry.shengfu,ary)
-	safeAppend('yunbu',entry.yunbu,ary)
-	safeAppend('sgzz',entry.sgzz,ary)
-
-def addPy(entry,ary,bold=True):
-	if bold==True:
-		safeAppend('pinyin',entry.pinyin,ary)
-	else:
-		safeAppend('pinyin',"<i>"+entry.pinyin+"</i>",ary)
-
-def addJp(entry,ary,bold=True):
-	if bold==True:
-		safeAppend('wu',entry.wu,ary)
-		safeAppend('han',entry.han,ary)
-	else:
-		safeAppend('wu',"<i>"+entry.wu+"</i>",ary)
-		safeAppend('han',"<i>"+entry.han+"</i>",ary)
-
-def addKr(entry,ary,bold=True):
-	ky=""
-	if entry.liu == "":
-		ky=entry.yin
-	else:
-		ky=entry.yin+"("+entry.liu+")"
-	safeAppend('kr',ky,ary)
-
-def addVn(entry,ary,bold=True):
-	safeAppend('vn',entry.yin,ary)
-
-def langAddToColumn(lang,dic,func):
-	size = len(dic)
-# 若不存在中古韻，建立新的行来填写本语言信息
-	if size == 0:
-		line={}
-		for entry in lang:
-			func(entry,line)
-		dic.append(line)
-# 若只有一個中古韻，則顯示在一行。（也许上古多于一行时，应建立新的行？）
-	elif size==1:
-		for entry in lang:
-			#填在第一行而不匹配当行中古韵的读音，用特殊字体标识
-			if dic[0]['xiaoyun']==entry.xiaoyun:
-				func(entry,dic[0])
-			else:
-				func(entry,dic[0],False)
-	elif size>1:
-# 若存在多个中古韻，則能匹配的填在對應的後面。
-		for entry in lang:
-			found=False
-			for x in range(0,size):
-				if dic[x]['xiaoyun']==entry.xiaoyun:
-					func(entry,dic[x])
-					found=True
-					break
-# 若不能匹配到中古韻。則填在第一行。
-			#填在第一行而不匹配当行中古韵的读音，用特殊字体标识
-			if not found:
-				func(entry,dic[0],False)
-
-def safeAppend(dst,src,dic):
-	if dst in dic.keys() and dic[dst]!="":
-		dic[dst] = dic[dst] + "," + src
-	else:
-		dic[dst] = src

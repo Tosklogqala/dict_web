@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
+	<link rel="stylesheet" href="{{ url_for('static',filename='css/dan.css') }}">
   	<div class="container-fluid">
   		<div class="row-fluid">
   			<div class="span10 offset1">
@@ -11,53 +12,67 @@
   					<fieldset>
   						<div class="control-group">
 							<div class="input-append">
-							  <input class="input-xlarge" id="zi" name="zi" type="text">
+							  <input class="input-xlarge" id="zi" name="zi" type="text"  placeholder= 
+							  {% if ext is not defined or ext.opt=="hanzi" %}""{% endif %}
+							  >
 							  <button class="btn btn-primary btn-large" type="submit">檢 索</button>
 							  
   						</div>
   						<div class="control-group"></div>
   						<div class="control-group">
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="hanzi" {% if opt is not defined or opt=="hanzi" %}checked{% endif %}>
+					            <input type="radio" name="opt" value="hanzi" {% if ext is not defined or ext.opt=="hanzi" %}checked{% endif %}>
 					            漢字
 					          </label>
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="sheng" {% if opt=='sheng' %}checked{% endif %}>
+					            <input type="radio" name="opt" value="sheng" {% if ext is defined and ext.opt=='sheng' %}checked{% endif %}>
 					            聲母
 					          </label>
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="yun" {% if opt=='yun' %}checked{% endif %}>
+					            <input type="radio" name="opt" value="yun" {% if ext is defined and ext.opt=='yun' %}checked{% endif %}>
 					            韻母
 					          </label>
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="xiaoyun" {% if opt=='xiaoyun' %}checked{% endif %}>
+					            <input type="radio" name="opt" value="xiaoyun" {% if ext is defined and ext.opt=='xiaoyun' %}checked{% endif %}>
 					            小韻
 					          </label>
+<!-- 					          <label class="radio inline">
+					            <input type="radio" name="opt" value="sgsf" {% if ext is defined and ext.opt=='sgsf' %}checked{% endif %}>
+					            聲符
+					          </label>
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="pychn">
-					            拼音
-					          </label>					       
+					            <input type="radio" name="opt" value="sgyb" {% if ext is defined and ext.opt=='sgyb' %}checked{% endif %}>
+					            韻部
+					          </label>	 -->
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="zgys">
+					            <input type="radio" name="opt" value="zgys" {% if ext is defined and ext.opt=='zgys' %}checked{% endif %}>
 					            中古拼音
 					          </label>
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="jpn">
-					            日語
+					            <input type="radio" name="opt" value="pychn" {% if ext is defined and ext.opt=='pychn' %}checked{% endif %}>
+					            拼音
 					          </label>
 					          <label class="radio inline">
-					            <input type="radio" name="opt" value="kor">
+					            <input type="radio" name="opt" value="jpnhan" {% if ext is defined and ext.opt=='jpnhan' %}checked{% endif %}>
+					            漢音
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="jpnwu" {% if ext is defined and ext.opt=='jpnwu' %}checked{% endif %}>
+					            吳音
+					          </label>
+					          <label class="radio inline">
+					            <input type="radio" name="opt" value="kor" {% if ext is defined and ext.opt=='kor' %}checked{% endif %}>
 					            韓語
 					          </label>
-					          <label class="radio inline">
-					            <input type="radio" name="opt" value="vnm">
+<!-- 					          <label class="radio inline">
+					            <input type="radio" name="opt" value="vnm" {% if ext is defined and ext.opt=='vnm' %}checked{% endif %}>
 					            越南
-					          </label>						          				      
+					          </label>		 -->				          				      
 				        </div>
   					</fieldset>
   				</form>
-  				{% if err==-1 %}
-  					<div class="alert alert-error setblank">輸入長度錯誤！</div>
+  				{% if ext is defined and ext.err==-1 %}
+  					<div class="alert alert-error setblank">輸入格式錯誤！</div>
   				{% else %}
 	  				{% if results is not defined %}
 	  				{% else %}
@@ -112,17 +127,42 @@
 							</tbody>
 					    </table>
 
-					    <div class="pagination">
-					    	<ul>
-					    		<li class="disabled"><a href='/'> 上一頁 </a></li>
-					    		<li class="disabled"><a href='/'> 1 </a></li>
-					    		<li class="active"><a href='/'> 2 </a></li>
-					    		<li class="active"><a href='/'> 3 </a></li>
-					    		<li class="disabled"><a href='/'> ... </a></li>
-					    		<li class="active"><a href='/'> 10 </a></li>
-					    		<li class="active"><a href='/'> 下一頁 </a></li>
-					    	</ul>
-					    </div>
+					    {% if ext.totalpage > 1 %}
+						    <div class="pagination">
+						    	<ul>
+						    		{% if ext.curpage == 1 %}
+						    		<li class="disabled"><a href='/'> 上一頁 </a></li>
+						    		<li class="disabled"><a href='/'> 1 </a></li>
+						    		{% else %}
+						    		<li class="active"><a href={{'/dan?zi='+ext.zi+'&opt='+ext.opt+'&page=%d'|format(ext.curpage-1)}}> 上一頁 </a></li>
+						    		<li class="active"><a href={{'/dan?zi='+ext.zi+'&opt='+ext.opt+'&page=1'}}> 1 </a></li>						 
+						    		{% endif %}
+
+						    		{% for idx in range(2,ext.totalpage) %}
+							    		{% if ext.curpage == idx %}
+							    		<li class="disabled"><a href='/'> {{idx}} </a></li>
+							    		{% else %}
+							    			{% if idx > ext.curpage-4 and idx < ext.curpage+4 %}
+							    			<li class="active"><a href={{'/dan?zi='+ext.zi+'&opt='+ext.opt+'&page=%d'|format(idx)}}> {{idx}} </a></li>
+							    			{% endif %}
+							    			{% if idx == ext.curpage-4 or idx == ext.curpage+4 %}
+							    			<li class="disabled"><a href='/'> ... </a></li>
+							    			{% endif %}
+							    		{% endif %}
+						    		{% endfor %}
+
+						    		{% if ext.curpage == ext.totalpage %}
+						    		<li class="disabled"><a href='/'> {{ext.totalpage}} </a></li>
+						    		<li class="disabled"><a href='/'> 下一頁 </a></li>
+						    		{% else %}
+						    		<li class="active">
+						    			<a href={{'/dan?zi='+ext.zi+'&opt='+ext.opt+'&page=%d'|format(ext.totalpage)}}> {{ext.totalpage}} </a>
+						    		</li>
+						    		<li class="active"><a href={{'/dan?zi='+ext.zi+'&opt='+ext.opt+'&page=%d'|format(ext.curpage+1)}}> 下一頁 </a></li>
+						    		{% endif %}
+						    	</ul>
+						    </div>
+					    {% endif %}
 				    {% endif %}
 			    {% endif %}
   			</div>

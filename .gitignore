@@ -9,3 +9,4 @@ dictWebServer/templates/pure.html
 dictWebServer/templates/search.html
 dictWebServer/templates/test.html
 dictWebServer/templates/trans.html
+dictWebServer/templates/show.html

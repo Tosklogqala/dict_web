@@ -1,5 +1,4 @@
 # coding=utf-8
-from bs4 import BeautifulSoup
 import requests
 
 import hashlib
@@ -144,7 +143,14 @@ j = [
 ['くゐゃ', 'くゐゅ', 'くゐょ', 'ぐゐゃ', 'ぐゐゅ', 'ぐゐょ', 'きゃ', 'きゅ', 'きょ', 'しゃ', 'しゅ', 'しょ', 'ちゃ', 'ちゅ', 'ちょ', 'にゃ', 'にゅ', 'にょ', 'ひゃ', 'ひゅ', 'ひょ', 'みゃ', 'みゅ', 'みょ', 'りゃ', 'りゅ', 'りょ', 'ゐゃ', 'ゐゅ', 'ゐょ', 'ぎゃ', 'ぎゅ', 'ぎょ', 'じゃ', 'じゅ', 'じょ', 'ぢゃ', 'ぢゅ', 'ぢょ', 'びゃ', 'びゅ', 'びょ', 'ぴゃ', 'ぴゅ', 'ぴょ', 'くゎ', 'くゐ', 'くゑ', 'くを', 'ぐゎ', 'ぐゐ', 'ぐゑ', 'ぐを', 'や', 'ゆ', 'よ', 'か', 'き', 'く', 'け', 'こ', 'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'ま', 'み', 'む', 'め', 'も', 'ら', 'り', 'る', 'れ', 'ろ', 'わ', 'ゐ', 'ゑ', 'を', 'が', 'ぎ', 'ぐ', 'げ', 'ご', 'ざ', 'じ', 'ず', 'ぜ', 'ぞ', 'だ', 'ぢ', 'づ', 'で', 'ど', 'ば', 'び', 'ぶ', 'べ', 'ぼ', 'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ', 'あ', 'い', 'う', 'え', 'お', 'ん', 'っ'], 
 ['kwya', 'kwyu', 'kwyo', 'gwya', 'gwyu', 'gwyo', 'kya', 'kyu', 'kyo', 'sya', 'syu', 'syo', 'tya', 'tyu', 'tyo', 'nya', 'nyu', 'nyo', 'hya', 'hyu', 'hyo', 'mya', 'myu', 'myo', 'rya', 'ryu', 'ryo', 'wya', 'wyu', 'wyo', 'gya', 'gyu', 'gyo', 'zya', 'zyu', 'zyo', 'dya', 'dyu', 'dyo', 'bya', 'byu', 'byo', 'pya', 'pyu', 'pyo', 'kwa', 'kwi', 'kwe', 'kwo', 'gwa', 'gwi', 'gwe', 'gwo', 'ya', 'yu', 'yo', 'ka', 'ki', 'ku', 'ke', 'ko', 'sa', 'si', 'su', 'se', 'so', 'ta', 'ti', 'tu', 'te', 'to', 'na', 'ni', 'nu', 'ne', 'no', 'ha', 'hi', 'hu', 'he', 'ho', 'ma', 'mi', 'mu', 'me', 'mo', 'ra', 'ri', 'ru', 're', 'ro', 'wa', 'wi', 'we', 'wo', 'ga', 'gi', 'gu', 'ge', 'go', 'za', 'zi', 'zu', 'ze', 'zo', 'da', 'di', 'du', 'de', 'do', 'ba', 'bi', 'bu', 'be', 'bo', 'pa', 'pi', 'pu', 'pe', 'po', 'a', 'i', 'u', 'e', 'o', 'n', 'q']]
 def jToR(kana):
-	for i,tmp in enumerate(j[0]):
-		kana = kana.replace(tmp,j[2][i])
+	_t1 = re.findall("[ア-ン]+",kana)
+	if len(_t1)==1 and _t1[0]==kana:
+		for i,tmp in enumerate(j[0]):
+			kana = kana.replace(tmp,j[2][i])
+	else:
+		_t2 = re.findall("[あ-ん]+",kana)
+		if len(_t2)==1 and _t2[0]==kana:
+			for i,tmp in enumerate(j[1]):
+				kana = kana.replace(tmp,j[2][i])
 
 	return kana
