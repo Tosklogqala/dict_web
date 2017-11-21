@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf8 -*-
 from ..dbModel import dbmodel
 from . import myTools as tl
 import json
